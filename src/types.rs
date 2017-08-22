@@ -179,6 +179,7 @@ pub enum Message {
     PinnedItem(MessagePinnedItem),
     ReplyBroadcast(MessageReplyBroadcast),
     UnpinnedItem(MessageUnpinnedItem),
+    Unknown(::serde_json::Value)
 }
 
 impl ::serde::Deserialize for Message {
@@ -348,7 +349,7 @@ impl ::serde::Deserialize for Message {
                             .map(|obj| Message::UnpinnedItem(obj))
                             .map_err(|e| D::Error::custom(&format!("{}", e)))
                     }
-                    _ => Err(D::Error::unknown_variant(ty, VARIANTS)),
+                    _ => Ok(Message::Unknown(value.clone())),
                 }
             } else {
                 Err(D::Error::invalid_type(::serde::de::Unexpected::Unit, &"a string"))
